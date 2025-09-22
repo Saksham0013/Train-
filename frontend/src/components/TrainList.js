@@ -20,7 +20,7 @@ export default function TrainList({ newTrainAdded }) {
 
     const fetchTrains = async () => {
         try {
-            const res = await axios.get("http://localhost:5000/api/trains");
+            const res = await axios.get("https://train-i3lw.onrender.com/api/trains");
             setTrains(res.data);
         } catch (err) {
             console.error("Error fetching trains:", err);
@@ -30,7 +30,7 @@ export default function TrainList({ newTrainAdded }) {
     const deleteTrain = async (id) => {
         if (!window.confirm("Delete this train?")) return;
         try {
-            await axios.delete(`http://localhost:5000/api/trains/${id}`, {
+            await axios.delete(`https://train-i3lw.onrender.com/api/trains/${id}`, {
                 headers: { Authorization: `Bearer ${token}` },
             });
             setTrains(trains.filter((t) => t._id !== id));

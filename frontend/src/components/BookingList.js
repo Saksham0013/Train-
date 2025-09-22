@@ -9,7 +9,7 @@ export default function BookingList() {
     useEffect(() => {
         const fetchBookings = async () => {
             try {
-                const res = await axios.get("http://localhost:5000/api/admin/bookings", {
+                const res = await axios.get("https://train-i3lw.onrender.com/api/admin/bookings", {
                     headers: { Authorization: `Bearer ${token}` },
                 });
                 console.log(res.data);
