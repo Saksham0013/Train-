@@ -3,18 +3,17 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 
 const Home = () => {
-    const [trains, setTrains] = useState([]); // default empty array
+    const [trains, setTrains] = useState([]); 
     const navigate = useNavigate();
 
     useEffect(() => {
         const fetchTrains = async () => {
             try {
                 const res = await axios.get("https://train-i3lw.onrender.com/api/trains");
-                // Ensure res.data is always an array
                 setTrains(Array.isArray(res.data) ? res.data : []);
             } catch (err) {
                 console.error("Failed to fetch trains:", err);
-                setTrains([]); // fallback
+                setTrains([]);
             }
         };
         fetchTrains();

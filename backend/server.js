@@ -13,9 +13,21 @@ dotenv.config();
 const app = express();
 
 app.use(express.json());
+
+const allowedOrigins = [
+    "http://localhost:3000",
+    "https://train-rosy.vercel.app",
+];
+
 app.use(
     cors({
-        origin: "http://localhost:3000", 
+        origin: function (origin, callback) {
+            if (!origin || allowedOrigins.includes(origin)) {
+                callback(null, true);
+            } else {
+                callback(new Error("Not allowed by CORS"));
+            }
+        },
         credentials: true,
     })
 );
@@ -50,7 +62,7 @@ const startServer = async () => {
         });
     } catch (err) {
         console.error("❌ Server Startup Error:", err.message);
-        process.exit(1); 
+        process.exit(1);
     }
 };
 
