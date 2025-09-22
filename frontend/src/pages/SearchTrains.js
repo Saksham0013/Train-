@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import axios from "../api";
 
 function SearchTrains() {
@@ -6,7 +7,8 @@ function SearchTrains() {
     const [source, setSource] = useState("");
     const [destination, setDestination] = useState("");
     const [trains, setTrains] = useState([]);
-    const [message, setMessage] = useState(""); // For displaying messages
+    const [message, setMessage] = useState("");
+    const navigate = useNavigate();
 
     // Search by Train Name or Number
     const handleSearchByQuery = async () => {
@@ -97,7 +99,9 @@ function SearchTrains() {
             {/* Search Results */}
             <ul className="search-list">
                 {trains.map((train) => (
-                    <li key={train._id} className="search-item">
+                    <li key={train._id} className="search-item" onClick={() => navigate(`/train-route/${train._id}`)} 
+                        style={{ cursor: "pointer" }}
+                    >
                         {train.trainNumber} - {train.name} ({train.source} → {train.destination})
                     </li>
                 ))}
