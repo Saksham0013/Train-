@@ -5,7 +5,7 @@ import { useNavigate } from "react-router-dom";
 function Profile() {
     const [userData, setUserData] = useState(null);
     const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(""); // For error messages
+    const [error, setError] = useState(""); 
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -25,8 +25,6 @@ function Profile() {
                     },
                 });
                 console.log("Profile data:", res.data);
-
-                // Ensure the response has required fields
                 if (res.data && res.data.name && res.data.email && res.data._id && res.data.role) {
                     setUserData(res.data);
                 } else {
