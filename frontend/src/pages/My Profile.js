@@ -17,7 +17,7 @@ function Profile() {
 
         const fetchProfile = async () => {
             try {
-                const res = await axios.get("https://train-i3lw.onrender.com/api/auth/me", {
+                const res = await axios.get("http://localhost:5000/api/auth/me", {
                     headers: {
                         Authorization: `Bearer ${token}`,
                         "Cache-Control": "no-cache",

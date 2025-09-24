@@ -60,7 +60,7 @@ const AddTrain = ({ onTrainAdded }) => {
             if (!token) throw new Error("You must be logged in to add a train.");
 
             const response = await axios.post(
-                "https://train-i3lw.onrender.com/api/trains",
+                "http://localhost:5000/api/trains",
                 payload,
                 {
                     headers: {

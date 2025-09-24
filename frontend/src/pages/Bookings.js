@@ -16,7 +16,16 @@ function Bookings() {
                 const res = await axios.get("/bookings", {
                     headers: { Authorization: `Bearer ${token}` },
                 });
-                setBookings(res.data);
+
+                const fetchedBookings = res.data.map(b => {
+                    // Mark waiting list bookings with position
+                    if (b.status?.toLowerCase() === "waiting" && b.position) {
+                        return { ...b, status: `Waiting (#${b.position})` };
+                    }
+                    return b;
+                });
+
+                setBookings(fetchedBookings);
             } catch (err) {
                 console.error("Fetch bookings error:", err);
                 alert("Failed to fetch bookings!");
@@ -25,7 +34,7 @@ function Bookings() {
         fetchBookings();
     }, []);
 
-    // Cancel booking
+    // Cancel booking (works for confirmed and waiting)
     const cancelBooking = async (id) => {
         if (!window.confirm("Are you sure you want to cancel this ticket?")) return;
 
@@ -116,17 +125,20 @@ function Bookings() {
                             onClick={() => setSelectedBooking(b)}
                             style={{ cursor: "pointer" }}
                         >
-                            {b.train.name} ({b.train.trainNumber}) - {new Date(b.date).toLocaleDateString()} | Seats: {b.seats}
+                            {b.train.name} ({b.train.trainNumber}) -{" "}
+                            {b.journeyDate
+                                ? new Date(b.journeyDate).toLocaleDateString()
+                                : "N/A"} | Seats: {b.seats}
                             <span
                                 style={{
                                     marginLeft: "10px",
                                     fontWeight: "bold",
-                                    color: b.status === "Cancelled" ? "red" : "green",
+                                    color: b.status.includes("Cancelled") ? "red" : "green",
                                 }}
                             >
                                 {b.status}
                             </span>
-                            {b.status !== "Cancelled" && (
+                            {!b.status.includes("Cancelled") && (
                                 <button
                                     onClick={(e) => {
                                         e.stopPropagation();
@@ -157,37 +169,67 @@ function Bookings() {
                     <div className="ticket-card" ref={ticketRef}>
                         <h3 className="ticket-header">🎫 Train e-Ticket</h3>
                         <div className="ticket-body">
-                            <p><strong>PNR:</strong> <span style={{ color: "#007bff" }}>{selectedBooking._id.slice(-8).toUpperCase()}</span></p>
+                            <p>
+                                <strong>PNR:</strong>{" "}
+                                <span style={{ color: "#007bff" }}>
+                                    {selectedBooking._id.slice(-8).toUpperCase()}
+                                </span>
+                            </p>
                             <hr />
-                            <p><strong>Train:</strong> {selectedBooking.train.name} ({selectedBooking.train.trainNumber})</p>
-                            <p><strong>Date:</strong> {new Date(selectedBooking.date).toLocaleDateString()}</p>
-                            <p><strong>From → To:</strong> {selectedBooking.startStation} → {selectedBooking.endStation}</p>
+                            <p>
+                                <strong>Train:</strong> {selectedBooking.train.name} (
+                                {selectedBooking.train.trainNumber})
+                            </p>
+                            <p>
+                                <strong>Date:</strong>{" "}
+                                {selectedBooking.journeyDate
+                                    ? new Date(selectedBooking.journeyDate).toLocaleDateString()
+                                    : "N/A"}
+                            </p>
+                            <p>
+                                <strong>From → To:</strong> {selectedBooking.startStation} →{" "}
+                                {selectedBooking.endStation}
+                            </p>
                             <hr />
-                            <p><strong>Passenger:</strong> {selectedBooking.passenger.name}, {selectedBooking.passenger.age} yrs</p>
-                            <p><strong>Seats:</strong> {selectedBooking.seats}</p>
-                            <p><strong>Status:</strong> <span style={{ color: selectedBooking.status === "Cancelled" ? "red" : "green" }}>{selectedBooking.status}</span></p>
-                            <p><strong>Fare:</strong> ₹{selectedBooking.price}</p>
+                            <p>
+                                <strong>Passenger:</strong> {selectedBooking.passenger.name},{" "}
+                                {selectedBooking.passenger.age} yrs
+                            </p>
+                            <p>
+                                <strong>Seats:</strong> {selectedBooking.seats}
+                            </p>
+                            <p>
+                                <strong>Status:</strong>{" "}
+                                <span
+                                    style={{
+                                        color: selectedBooking.status.includes("Cancelled")
+                                            ? "red"
+                                            : "green",
+                                    }}
+                                >
+                                    {selectedBooking.status}
+                                </span>
+                            </p>
+                            <p>
+                                <strong>Fare:</strong> ₹{selectedBooking.price}
+                            </p>
                         </div>
-
-                        {/* QR Code */}
-                        {/* <div style={{ textAlign: "center", margin: "15px 0" }}>
-                            <QRCodeSVG
-                                value={selectedBooking._id}
-                                size={100}
-                                bgColor="#ffffff"
-                                fgColor="#000000"
-                                level="H"
-                                includeMargin={true}
-                            />
-                            <p style={{ fontSize: "12px", marginTop: "5px" }}>Scan for ticket details</p>
-                        </div> */}
                     </div>
 
                     {/* Ticket Actions */}
                     <div className="ticket-actions">
-                        <button className="download-btn" onClick={downloadPDF}>⬇️ Download PDF</button>
-                        <button className="print-btn" onClick={printTicket}>🖨️ Print Ticket</button>
-                        <button className="close-btn" onClick={() => setSelectedBooking(null)}>❌ Close</button>
+                        <button className="download-btn" onClick={downloadPDF}>
+                            ⬇️ Download PDF
+                        </button>
+                        <button className="print-btn" onClick={printTicket}>
+                            🖨️ Print Ticket
+                        </button>
+                        <button
+                            className="close-btn"
+                            onClick={() => setSelectedBooking(null)}
+                        >
+                            ❌ Close
+                        </button>
                     </div>
                 </div>
             )}

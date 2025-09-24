@@ -2,12 +2,12 @@ const mongoose = require("mongoose");
 
 // Passenger schema (embedded)
 const passengerSchema = new mongoose.Schema({
-    name: { type: String, required: true },
-    phone: { type: String, required: true },
-    age: { type: Number, required: true },
-    email: { type: String, required: true },
-    aadhar: { type: String, required: true },
-    address: { type: String, required: true },
+    name: { type: String, required: true, trim: true },
+    phone: { type: String, required: true, trim: true },
+    age: { type: Number, required: true, min: 0 },
+    email: { type: String, required: true, trim: true },
+    aadhar: { type: String, required: true, trim: true },
+    address: { type: String, required: true, trim: true },
 });
 
 // Booking schema
@@ -47,10 +47,17 @@ const bookingSchema = new mongoose.Schema(
             trim: true,
         },
 
-           // Journey Date
-        date: {
-            type: Date,
+        // Journey Date
+        journeyDate: {
+            type: String, 
             required: true,
+            trim: true,
+            validate: {
+                validator: function (v) {
+                    return /^\d{4}-\d{2}-\d{2}$/.test(v);
+                },
+                message: props => `${props.value} is not a valid date (YYYY-MM-DD)!`,
+            },
         },
 
         // Distance and Fare
@@ -72,20 +79,20 @@ const bookingSchema = new mongoose.Schema(
             min: 0,
         },
 
-        // Segment tracking (for seat allocation)
+        // Optional Segment tracking (for seat allocation between stations)
         segmentsBooked: [
             {
                 from: { type: String, required: true },
                 to: { type: String, required: true },
-                seats: { type: Number, required: true },
+                seats: { type: Number, required: true, min: 1 },
             },
         ],
 
         // Status
         status: {
             type: String,
-            enum: ["Confirmed", "Cancelled"],
-            default: "Confirmed", 
+            enum: ["Confirmed", "Waiting", "Cancelled"],
+            default: "Confirmed",
         },
     },
     { timestamps: true }

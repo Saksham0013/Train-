@@ -1,11 +1,12 @@
 import { useState, useEffect, useContext } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { AuthContext } from "../context/AuthContext";
 
 export default function BookingForm() {
     const { token } = useContext(AuthContext);
     const { trainId: paramTrainId } = useParams();
+    const navigate = useNavigate();
 
     const [trains, setTrains] = useState([]);
     const [trainId, setTrainId] = useState(paramTrainId || "");
@@ -14,7 +15,6 @@ export default function BookingForm() {
     const [seats, setSeats] = useState(1);
     const [loading, setLoading] = useState(true);
     const [price, setPrice] = useState(0);
-
     const [journeyDate, setJourneyDate] = useState("");
 
     const [passenger, setPassenger] = useState({
@@ -26,13 +26,11 @@ export default function BookingForm() {
         address: ""
     });
 
-    const [paymentMethod, setPaymentMethod] = useState("UPI");
-
     // Fetch trains
     useEffect(() => {
         const fetchTrains = async () => {
             try {
-                const res = await axios.get("https://train-i3lw.onrender.com/api/trains");
+                const res = await axios.get("http://localhost:5000/api/trains");
                 setTrains(res.data);
 
                 if (paramTrainId && !res.data.find((t) => t._id === paramTrainId)) {
@@ -84,19 +82,17 @@ export default function BookingForm() {
                 startStation,
                 endStation,
                 passenger,
-                date: journeyDate, // match backend field name
-                price,
-                paymentMethod
+                journeyDate, // match backend field name
+                price
             };
 
             const res = await axios.post(
-                "https://train-i3lw.onrender.com/api/bookings",
+                "http://localhost:5000/api/bookings",
                 bookingData,
                 { headers: { Authorization: `Bearer ${token}` } }
             );
 
-            alert("Booking successful!");
-            console.log("Booking response:", res.data);
+            alert(res.data.message);
 
             // Reset form
             setSeats(1);
@@ -111,8 +107,10 @@ export default function BookingForm() {
                 aadhar: "",
                 address: ""
             });
-            setPaymentMethod("UPI");
             setPrice(0);
+
+            // Navigate to user's bookings page
+            navigate("/my-bookings");
         } catch (err) {
             console.error("Booking error:", err.response?.data || err.message);
             alert(err.response?.data?.message || "Booking failed. Please try again.");
@@ -140,7 +138,7 @@ export default function BookingForm() {
 
                 {/* Train Selection */}
                 <label>
-                    Select Train:
+                    Train:
                     <select
                         value={trainId}
                         onChange={(e) => {
@@ -153,8 +151,7 @@ export default function BookingForm() {
                         <option value="">-- Select train --</option>
                         {trains.map((t) => (
                             <option key={t._id} value={t._id}>
-                                {t.name} - {t.source} → {t.destination} ({t.seats} seats
-                                available, ₹{t.price}/seat)
+                                {t.name} - {t.source} → {t.destination} ({t.seats} seats available)
                             </option>
                         ))}
                     </select>
@@ -193,8 +190,7 @@ export default function BookingForm() {
                                 {stopsOptions
                                     .filter((s, idx) =>
                                         startStation
-                                            ? idx >
-                                            stopsOptions.findIndex((st) => st.station === startStation)
+                                            ? idx > stopsOptions.findIndex((st) => st.station === startStation)
                                             : true
                                     )
                                     .map((s, idx) => (
@@ -241,67 +237,42 @@ export default function BookingForm() {
                     placeholder="Full Name"
                     required
                     value={passenger.name}
-                    onChange={(e) =>
-                        setPassenger({ ...passenger, name: e.target.value })
-                    }
+                    onChange={(e) => setPassenger({ ...passenger, name: e.target.value })}
                 />
                 <input
                     type="tel"
                     placeholder="Phone Number"
                     required
                     value={passenger.phone}
-                    onChange={(e) =>
-                        setPassenger({ ...passenger, phone: e.target.value })
-                    }
+                    onChange={(e) => setPassenger({ ...passenger, phone: e.target.value })}
                 />
                 <input
                     type="number"
                     placeholder="Age"
                     required
                     value={passenger.age}
-                    onChange={(e) =>
-                        setPassenger({ ...passenger, age: e.target.value })
-                    }
+                    onChange={(e) => setPassenger({ ...passenger, age: e.target.value })}
                 />
                 <input
                     type="email"
                     placeholder="Email"
                     required
                     value={passenger.email}
-                    onChange={(e) =>
-                        setPassenger({ ...passenger, email: e.target.value })
-                    }
+                    onChange={(e) => setPassenger({ ...passenger, email: e.target.value })}
                 />
                 <input
                     type="text"
                     placeholder="Aadhar Card Number"
                     required
                     value={passenger.aadhar}
-                    onChange={(e) =>
-                        setPassenger({ ...passenger, aadhar: e.target.value })
-                    }
+                    onChange={(e) => setPassenger({ ...passenger, aadhar: e.target.value })}
                 />
                 <textarea
                     placeholder="Address"
                     required
                     value={passenger.address}
-                    onChange={(e) =>
-                        setPassenger({ ...passenger, address: e.target.value })
-                    }
+                    onChange={(e) => setPassenger({ ...passenger, address: e.target.value })}
                 ></textarea>
-
-                {/* Payment Method */}
-                {/* <label>
-                    Payment Method:
-                    <select
-                        value={paymentMethod}
-                        onChange={(e) => setPaymentMethod(e.target.value)}
-                    >
-                        <option value="UPI">UPI</option>
-                        <option value="Card">Card</option>
-                        <option value="Cash">Cash on Delivery</option>
-                    </select>
-                </label> */}
 
                 <button
                     type="submit"

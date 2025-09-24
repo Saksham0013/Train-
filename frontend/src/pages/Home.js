@@ -3,13 +3,13 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 
 const Home = () => {
-    const [trains, setTrains] = useState([]); 
+    const [trains, setTrains] = useState([]);
     const navigate = useNavigate();
 
     useEffect(() => {
         const fetchTrains = async () => {
             try {
-                const res = await axios.get("https://train-i3lw.onrender.com/api/trains");
+                const res = await axios.get("http://localhost:5000/api/trains");
                 setTrains(Array.isArray(res.data) ? res.data : []);
             } catch (err) {
                 console.error("Failed to fetch trains:", err);
@@ -20,13 +20,12 @@ const Home = () => {
     }, []);
 
     const handleBookTicket = (train) => {
-        if (train.seats > 0) {
-            navigate(`/BookingForm/${train._id}`);
-        }
+        // always allow booking, even if seats = 0
+        navigate(`/BookingForm/${train._id}`);
     };
 
     const handleCardClick = (train) => {
-        navigate(`/train-route/${train._id}`); 
+        navigate(`/train-route/${train._id}`);
     };
 
     return (
@@ -37,7 +36,7 @@ const Home = () => {
                     trains.map((train) => (
                         <div
                             key={train._id}
-                            className={`train-card ${train.seats === 0 ? "sold-out" : ""}`}
+                            className="train-card"
                             onClick={() => handleCardClick(train)}
                             style={{ cursor: "pointer" }}
                         >
@@ -50,15 +49,14 @@ const Home = () => {
                             <p>Departure: {train.departureTime}</p>
                             <p>Arrival: {train.arrivalTime}</p>
                             <p>Seats: {train.seats}</p>
-                            {/* <p>Price: ₹{train.price}</p> */}
+
                             <button
                                 onClick={(e) => {
                                     e.stopPropagation();
                                     handleBookTicket(train);
                                 }}
-                                disabled={train.seats === 0}
                             >
-                                {train.seats > 0 ? "Book Ticket" : "Sold Out"}
+                                {train.seats > 0 ? "Book Ticket" : "Book Ticket"}
                             </button>
                         </div>
                     ))

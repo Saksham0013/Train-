@@ -7,7 +7,7 @@ const { getAllUsers, deleteUser, getBookings, getTrains } = require("../controll
 router.get("/users", protect, admin, getAllUsers);
 router.delete("/users/:id", protect, admin, deleteUser);
 
-// Bookings
+// Bookings (confirmed + waiting list)
 router.get("/bookings", protect, admin, getBookings);
 
 // Trains (admin view)

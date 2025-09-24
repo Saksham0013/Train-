@@ -1,6 +1,7 @@
 const User = require("../models/User");
 const Booking = require("../models/Booking");
 const Train = require("../models/Train");
+const { WaitingList } = require("../models/Waiting"); 
 
 // ✅ Get all users (exclude password)
 const getAllUsers = async (req, res) => {
@@ -26,14 +27,42 @@ const deleteUser = async (req, res) => {
     }
 };
 
-// ✅ Get all bookings (with user + train populated)
+// ✅ Get all bookings (with user + train populated) and include waiting list
 const getBookings = async (req, res) => {
     try {
+        // Fetch confirmed bookings
         const bookings = await Booking.find()
             .populate("user", "name email") // only show these fields
             .populate("train", "name source destination price seats");
 
-        res.json(bookings);
+        // Fetch waiting list bookings
+        const waiting = await WaitingList.find()
+            .populate("user", "name email")
+            .populate("train", "name source destination price seats")
+            .sort({ journeyDate: 1, position: 1 });
+
+        // Map waiting list to booking-like structure
+        const waitingMapped = waiting.map(w => ({
+            _id: w._id,
+            user: w.user,
+            train: w.train,
+            seats: w.seats,
+            passenger: w.passenger,
+            startStation: w.startStation,
+            endStation: w.endStation,
+            journeyDate: w.journeyDate,
+            price: w.price,
+            fare: w.fare,
+            status: `Waiting (#${w.position})`,
+            distance: w.fare / 2 // optional approximation
+        }));
+
+        // Combine confirmed bookings and waiting list
+        const allBookings = [...bookings, ...waitingMapped].sort(
+            (a, b) => new Date(b.createdAt || b.journeyDate) - new Date(a.createdAt || a.journeyDate)
+        );
+
+        res.json(allBookings);
     } catch (err) {
         console.error("Error fetching bookings:", err);
         res.status(500).json({ message: "Failed to fetch bookings" });

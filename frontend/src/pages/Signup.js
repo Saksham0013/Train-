@@ -28,7 +28,7 @@ const Signup = () => {
 
         try {
             const res = await axios.post(
-                "https://train-i3lw.onrender.com/api/auth/signup",
+                "http://localhost:5000/api/auth/signup",
                 formData,
                 { headers: { "Content-Type": "application/json" } }
             );

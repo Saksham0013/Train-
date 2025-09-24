@@ -10,7 +10,7 @@ const TrainRoute = () => {
     useEffect(() => {
         const fetchTrain = async () => {
             try {
-                const res = await axios.get(`https://train-i3lw.onrender.com/api/trains/${trainId}`);
+                const res = await axios.get(`http://localhost:5000/api/trains/${trainId}`);
                 setTrain(res.data);
             } catch (err) {
                 console.error("Failed to fetch train details:", err);

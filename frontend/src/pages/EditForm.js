@@ -86,7 +86,7 @@ export default function EditTrainForm({ train, setEditTrain, onUpdated }) {
             ];
 
             const res = await axios.put(
-                `https://train-i3lw.onrender.com/api/trains/${train._id}`,
+                `http://localhost:5000/api/trains/${train._id}`,
                 { ...dataToSend, stops: stopsWithDestination },
                 { headers: { Authorization: `Bearer ${token}` } }
             );
