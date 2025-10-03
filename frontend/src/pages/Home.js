@@ -9,7 +9,7 @@ const Home = () => {
     useEffect(() => {
         const fetchTrains = async () => {
             try {
-                const res = await axios.get("http://localhost:5000/api/trains");
+                const res = await axios.get("https://train-i3lw.onrender.com/api/trains");
                 setTrains(Array.isArray(res.data) ? res.data : []);
             } catch (err) {
                 console.error("Failed to fetch trains:", err);

@@ -8,7 +8,7 @@ export default function UserList() {
 
     useEffect(() => {
         const fetchUsers = async () => {
-            const res = await axios.get("http://localhost:5000/api/admin/users", { headers: { Authorization: `Bearer ${token}` } });
+            const res = await axios.get("https://train-i3lw.onrender.com/api/admin/users", { headers: { Authorization: `Bearer ${token}` } });
             setUsers(res.data);
         };
         fetchUsers();
@@ -16,7 +16,7 @@ export default function UserList() {
 
     // const deleteUser = async (id) => {
     //     if (!window.confirm("Delete this user?")) return;
-    //     await axios.delete(`http://localhost:5000/api/admin/users/${id}`, { headers: { Authorization: `Bearer ${token}` } });
+    //     await axios.delete(`https://train-i3lw.onrender.com/api/admin/users/${id}`, { headers: { Authorization: `Bearer ${token}` } });
     //     setUsers(users.filter((u) => u._id !== id));
     // };
 

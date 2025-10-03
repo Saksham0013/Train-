@@ -30,7 +30,7 @@ export default function BookingForm() {
     useEffect(() => {
         const fetchTrains = async () => {
             try {
-                const res = await axios.get("http://localhost:5000/api/trains");
+                const res = await axios.get("https://train-i3lw.onrender.com/api/trains");
                 setTrains(res.data);
 
                 if (paramTrainId && !res.data.find((t) => t._id === paramTrainId)) {
@@ -87,7 +87,7 @@ export default function BookingForm() {
             };
 
             const res = await axios.post(
-                "http://localhost:5000/api/bookings",
+                "https://train-i3lw.onrender.com/api/bookings",
                 bookingData,
                 { headers: { Authorization: `Bearer ${token}` } }
             );
